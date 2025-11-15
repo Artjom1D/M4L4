@@ -84,6 +84,8 @@ class DB_Manager:
             cur = conn.cursor()
             cur.execute("SELECT * FROM dataset WHERE Channel LIKE ?", (f"%{name}%",))
             rows = cur.fetchall()
-            return rows
+            columns = [desc[0] for desc in cur.description]
+
+            return rows, columns
 if __name__ == '__main__':
     manager = DB_Manager(DATABASE)

@@ -30,7 +30,8 @@ def start(message):
                          "/add <название> — добавить канал в избранное\n"
                          "/show — показать твои избранные каналы\n"
                          "/delete - удалить из избранных\n"
-                         "/find - найти канал")
+                         "/find - найти канал\n"
+                         "/info - информация про стримера")
 
 @bot.message_handler(commands=["add"])
 def add(message):
@@ -85,12 +86,18 @@ def info(message):
         bot.send_message(message.chat.id, "Ты не написал название канала")
     else:
         names = parts[1]
-        result = manager.infok(names)
+        result, columns = manager.infok(names)
         if len(result) > 1:
             bot.send_message(message.chat.id, "Было найдено много каналов с похожем именем, которое вы отправили")
             result = manager.find_acc(names)
             bot.reply_to(message, "\n".join(result))
             bot.send_message(message.chat.id, "Кто иммено из них")
+        elif len(result) == 1:
+            row = result[0]
+            text = "\n".join([f"{col}: {row[i]}" for i, col in enumerate(columns)])
+            bot.reply_to(message, text)
+        elif len(result) == 0:
+            bot.send_message(message.chat.id, "Ничего не найдено")
 
 @bot.callback_query_handler(func=lambda call: True)
 def talk(message):
